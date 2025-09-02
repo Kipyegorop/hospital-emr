@@ -189,30 +189,46 @@ class PatientController extends Controller
         $patient = null;
         $encounter = null;
 
-        DB::transaction(function () use ($request, &$patient, &$encounter, $validator) {
-            // Use only validated data to create patient
-            $validated = $validator->validated();
+        try {
+            DB::transaction(function () use ($request, &$patient, &$encounter, $validator) {
+                // Use only validated data to create patient
+                $validated = $validator->validated();
 
-            // Generate unique identifiers
-            $patientNumber = Patient::generatePatientNumber();
-            $uhid = Patient::generateUhid();
+                // Generate unique identifiers
+                $patientNumber = Patient::generatePatientNumber();
+                $uhid = Patient::generateUhid();
 
-            // Create patient
-            $patient = Patient::create(array_merge($validated, [
-                'patient_number' => $patientNumber,
-                'uhid' => $uhid,
-            ]));
+                // Create patient
+                $patient = Patient::create(array_merge($validated, [
+                    'patient_number' => $patientNumber,
+                    'uhid' => $uhid,
+                ]));
 
-            // Create initial encounter (use any provided chief_complaint from request)
-            $encounter = Encounter::create([
-                'encounter_number' => Encounter::generateEncounterNumber(),
-                'patient_id' => $patient->id,
-                'encounter_type' => 'outpatient',
-                'status' => 'active',
-                'start_time' => now(),
-                'chief_complaint' => $request->input('chief_complaint', 'Initial registration'),
-            ]);
-        });
+                // Create initial encounter (use any provided chief_complaint from request)
+                $encounter = Encounter::create([
+                    'encounter_number' => Encounter::generateEncounterNumber(),
+                    'patient_id' => $patient->id,
+                    'encounter_type' => 'outpatient',
+                    'status' => 'active',
+                    'start_time' => now(),
+                    'chief_complaint' => $request->input('chief_complaint', 'Initial registration'),
+                ]);
+            });
+        } catch (\Exception $e) {
+            // Log the exception if you have a logger; return a clean error response
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to create patient: ' . $e->getMessage(),
+            ], 500);
+        }
+
+        // Ensure creation succeeded
+        if (!$patient || !$encounter) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Patient creation failed for unknown reasons.'
+            ], 500);
+        }
 
         return response()->json([
             'status' => 'success',

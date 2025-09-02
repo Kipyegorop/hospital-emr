@@ -11,6 +11,8 @@ use App\Models\Encounter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use App\Models\Bill;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -241,6 +243,7 @@ class OrderController extends Controller
                 case 'completed':
                     $updateData['completed_at'] = now();
                     $updateData['completed_by_user_id'] = $currentUserId;
+                    $wasCompleted = true;
                     break;
                 case 'cancelled':
                 case 'discontinued':
@@ -259,6 +262,46 @@ class OrderController extends Controller
         }
 
         $order->update($updateData);
+        // If the order was completed, create a bill for billable items
+        if (!empty($wasCompleted) && $order->billable) {
+            try {
+                $items = $order->orderItems->map(function($it){
+                    return [
+                        'type' => 'order_item',
+                        'reference' => $it->id,
+                        'name' => $it->item_name,
+                        'quantity' => $it->quantity,
+                        'unit_price' => $it->unit_price ?? 0,
+                        'total' => $it->total_price ?? 0,
+                        'billing_code' => $it->billing_code ?? null,
+                    ];
+                })->toArray();
+
+                $subtotal = array_sum(array_column($items, 'total'));
+
+                Bill::create([
+                    'bill_number' => 'BILL-'.Str::upper(Str::random(8)),
+                    'patient_id' => $order->patient_id,
+                    'created_by' => $request->user()->id,
+                    'bill_type' => $order->order_type,
+                    'description' => 'Order #'.$order->order_number.' completed',
+                    'bill_date' => now()->toDateString(),
+                    'subtotal' => $subtotal,
+                    'tax_amount' => 0.00,
+                    'discount_amount' => 0.00,
+                    'total_amount' => $subtotal,
+                    'amount_paid' => 0.00,
+                    'balance_due' => $subtotal,
+                    'payment_method' => 'pending',
+                    'payment_status' => 'pending',
+                    'billable_items' => $items,
+                    'appointment_id' => $order->encounter_id,
+                    'status' => 'active',
+                ]);
+            } catch (\Exception $e) {
+                logger()->error('Failed to create bill for completed order: '.$e->getMessage());
+            }
+        }
         $order->load(['patient', 'orderingPhysician', 'department', 'targetDepartment', 'orderItems']);
 
         return response()->json([

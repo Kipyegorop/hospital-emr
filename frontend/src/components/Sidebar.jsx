@@ -76,11 +76,34 @@ const Sidebar = ({ isOpen, onClose, currentPath }) => {
       roles: ['pharmacist', 'admin', 'super_admin'],
     },
     {
+      name: 'Pharmacy Exceptions',
+      href: '/pharmacy/exceptions',
+      icon: Pill,
+      roles: ['pharmacist', 'admin', 'super_admin'],
+    },
+    {
+      name: 'Pharmacy Sales',
+      href: '/pharmacy/sales',
+      icon: Receipt,
+      roles: ['pharmacist', 'admin', 'super_admin'],
+    },
+    {
+      name: 'Stock History',
+      href: '/pharmacy/stock-history',
+      icon: FileText,
+      roles: ['pharmacist', 'admin', 'super_admin'],
+    },
+    {
       name: 'Bills',
       href: '/bills',
       icon: Receipt,
       roles: ['admin', 'super_admin', 'receptionist'],
     },
+      {
+        name: 'Create Bill',
+        href: '/bills/create',
+        icon: 'plus',
+      },
     {
       name: 'NHIF Claims',
       href: '/nhif-claims',

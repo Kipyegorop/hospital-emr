@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Prescription;
 use App\Models\PrescriptionException;
 use App\Models\PharmacySale;
+use App\Models\Bill;
+use Illuminate\Support\Str;
 use App\Models\Medication;
 use App\Models\Patient;
 use Illuminate\Http\Request;
@@ -495,6 +497,44 @@ class PrescriptionController extends Controller
             if ($prescription->medication) {
                 $medication = $prescription->medication;
                 $medication->decrement('current_stock', $quantityToDispense);
+            }
+
+            // Create a bill for this pharmacy sale
+            try {
+                $items = [[
+                    'type' => 'medication',
+                    'reference' => $pharmacySale->id,
+                    'name' => $pharmacySale->medication_name,
+                    'quantity' => $pharmacySale->quantity_sold,
+                    'unit_price' => $pharmacySale->unit_price,
+                    'total' => $pharmacySale->total_amount,
+                    'billing_code' => null,
+                ]];
+
+                $billData = [
+                    'bill_number' => 'BILL-'.Str::upper(Str::random(8)),
+                    'patient_id' => $prescription->patient_id,
+                    'created_by' => $request->user()->id,
+                    'bill_type' => 'medication',
+                    'description' => 'Medication sale for prescription '.$prescription->prescription_number.' (Sale: '.$pharmacySale->sale_number.')',
+                    'bill_date' => now()->toDateString(),
+                    'subtotal' => $pharmacySale->total_amount,
+                    'tax_amount' => 0.00,
+                    'discount_amount' => 0.00,
+                    'total_amount' => $pharmacySale->total_amount,
+                    'amount_paid' => 0.00,
+                    'balance_due' => $pharmacySale->total_amount,
+                    'payment_method' => 'pending',
+                    'payment_status' => 'pending',
+                    'billable_items' => $items,
+                    'prescription_id' => $prescription->id,
+                    'status' => 'active',
+                ];
+
+                Bill::create($billData);
+            } catch (\Exception $e) {
+                // swallow bill creation errors to avoid breaking dispensing; log if available
+                logger()->error('Failed to create bill for pharmacy sale: '.$e->getMessage());
             }
         });
 

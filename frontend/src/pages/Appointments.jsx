@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, Calendar, Clock, User, Stethoscope } from 'lucide-react';
+import AppointmentForm from '../components/AppointmentForm';
 
 const Appointments = () => {
   const [appointments] = useState([
@@ -36,7 +37,7 @@ const Appointments = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {appointments.map((appointment) => (
           <div key={appointment.id} className="card">
             <div className="card-header">
@@ -67,6 +68,16 @@ const Appointments = () => {
             </div>
           </div>
         ))}
+      </div>
+      
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2"></div>
+        <div>
+          <div className="bg-card border border-border rounded-lg p-4">
+            <h2 className="font-semibold mb-2">Book Appointment</h2>
+            <AppointmentForm />
+          </div>
+        </div>
       </div>
     </div>
   );

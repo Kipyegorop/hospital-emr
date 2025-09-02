@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\PharmacySaleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -133,6 +134,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/medications/low-stock', [MedicationController::class, 'lowStock']);
     Route::get('/medications/expiring', [MedicationController::class, 'expiring']);
     Route::post('/medications/{medication}/adjust-stock', [MedicationController::class, 'adjustStock']);
+    
+    // Pharmacy sales returns
+    Route::post('/pharmacy-sales/{pharmacySale}/return', [PharmacySaleController::class, 'returnSale']);
     
     // Bills
     Route::apiResource('bills', BillController::class);

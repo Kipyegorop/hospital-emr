@@ -13,7 +13,12 @@ import Prescriptions from './pages/Prescriptions';
 import Wards from './pages/Wards';
 import LabTests from './pages/LabTests';
 import Medications from './pages/Medications';
+import Exceptions from './pages/Exceptions';
+import SalesReport from './pages/SalesReport';
+import StockHistory from './pages/StockHistory';
 import Bills from './pages/Bills';
+import BillDetail from './pages/BillDetail';
+import CreateBill from './pages/CreateBill';
 import NhifClaims from './pages/NhifClaims';
 import Users from './pages/Users';
 import Reports from './pages/Reports';
@@ -56,7 +61,12 @@ function App() {
                   <Route path="wards" element={<Wards />} />
                   <Route path="lab-tests" element={<LabTests />} />
                   <Route path="medications" element={<Medications />} />
+                  <Route path="pharmacy/exceptions" element={<Exceptions />} />
+                  <Route path="pharmacy/sales" element={<SalesReport />} />
+                  <Route path="pharmacy/stock-history" element={<StockHistory />} />
                   <Route path="bills" element={<Bills />} />
+                  <Route path="bills/create" element={<CreateBill />} />
+                  <Route path="bills/:id" element={<BillDetail />} />
                   <Route path="nhif-claims" element={<NhifClaims />} />
                   <Route path="users" element={<Users />} />
                   <Route path="reports" element={<Reports />} />
