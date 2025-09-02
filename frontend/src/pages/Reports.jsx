@@ -1,0 +1,1 @@
+import React from "react"; const Reports = () => <div className="p-8 text-center"><h1 className="text-3xl font-bold mb-4">Reports</h1><p>Reports module coming soon...</p></div>; export default Reports;
