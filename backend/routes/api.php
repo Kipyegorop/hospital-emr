@@ -119,6 +119,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/beds/ward/{ward}', [BedController::class, 'wardBeds']);
     Route::post('/beds/{bed}/assign', [BedController::class, 'assign']);
     Route::post('/beds/{bed}/vacate', [BedController::class, 'vacate']);
+
+    // Vitals / Nursing
+    Route::post('/vitals', [\App\Http\Controllers\Api\VitalController::class, 'store']);
+    Route::post('/nursing-assessments', [\App\Http\Controllers\Api\NursingAssessmentController::class, 'store']);
+    Route::post('/medication-administrations', [\App\Http\Controllers\Api\MedicationAdministrationController::class, 'store']);
     
     // Lab Tests
     Route::apiResource('lab-tests', LabTestController::class);
@@ -137,6 +142,21 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Pharmacy sales returns
     Route::post('/pharmacy-sales/{pharmacySale}/return', [PharmacySaleController::class, 'returnSale']);
+    
+    // OPD & IPD module entry points
+    Route::get('/opd', [\App\Http\Controllers\Api\OpdController::class, 'index']);
+    Route::get('/opd/worklist', [\App\Http\Controllers\Api\OpdController::class, 'worklist']);
+
+    // IPD dashboard is readable by clinical staff
+    Route::get('/ipd', [\App\Http\Controllers\Api\IpdController::class, 'index']);
+    Route::get('/ipd/dashboard', [\App\Http\Controllers\Api\IpdController::class, 'dashboard']);
+
+    // IPD clinical actions - restrict to nurse, doctor, admin, super_admin
+    Route::middleware('role:nurse,doctor,admin,super_admin')->group(function () {
+        Route::post('/ipd/admit', [\App\Http\Controllers\Api\IpdController::class, 'admit']);
+        Route::post('/ipd/transfer', [\App\Http\Controllers\Api\IpdController::class, 'transfer']);
+        Route::post('/ipd/discharge', [\App\Http\Controllers\Api\IpdController::class, 'discharge']);
+    });
     
     // Bills
     Route::apiResource('bills', BillController::class);

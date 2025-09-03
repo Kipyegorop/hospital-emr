@@ -15,6 +15,7 @@ import {
   User,
   Settings
 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose, currentPath }) => {
   const navigate = useNavigate();
@@ -50,6 +51,18 @@ const Sidebar = ({ isOpen, onClose, currentPath }) => {
       href: '/consultations',
       icon: Stethoscope,
       roles: ['doctor', 'nurse', 'admin', 'super_admin'],
+    },
+    {
+      name: 'OPD',
+      href: '/opd',
+      icon: Building2,
+      roles: ['*'],
+    },
+    {
+      name: 'IPD',
+      href: '/ipd',
+      icon: Building2,
+      roles: ['nurse', 'doctor', 'admin', 'super_admin'],
     },
     {
       name: 'Prescriptions',
@@ -102,7 +115,8 @@ const Sidebar = ({ isOpen, onClose, currentPath }) => {
       {
         name: 'Create Bill',
         href: '/bills/create',
-        icon: 'plus',
+        icon: Plus,
+        roles: ['admin', 'super_admin', 'receptionist'],
       },
     {
       name: 'NHIF Claims',

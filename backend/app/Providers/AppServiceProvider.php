@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Alias the role middleware in case Kernel routeMiddleware isn't used by the test runner.
+        if ($this->app->bound('router')) {
+            $this->app['router']->aliasMiddleware('role', \App\Http\Middleware\RoleMiddleware::class);
+        }
     }
 }

@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastContext';
+import { ConfirmProvider } from './contexts/ConfirmContext';
+import ToastContainer from './components/ToastContainer';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -22,6 +25,9 @@ import CreateBill from './pages/CreateBill';
 import NhifClaims from './pages/NhifClaims';
 import Users from './pages/Users';
 import Reports from './pages/Reports';
+import OPD from './pages/OPD';
+import IPD from './pages/IPD';
+import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Create a client
@@ -39,8 +45,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <Router>
-            <div className="min-h-screen bg-background">
+          <ToastProvider>
+            <ConfirmProvider>
+                <Router>
+                  <div className="min-h-screen bg-background">
               <Routes>
                 {/* Public routes */}
                 <Route path="/login" element={<Login />} />
@@ -64,6 +72,9 @@ function App() {
                   <Route path="pharmacy/exceptions" element={<Exceptions />} />
                   <Route path="pharmacy/sales" element={<SalesReport />} />
                   <Route path="pharmacy/stock-history" element={<StockHistory />} />
+                  <Route path="opd" element={<OPD />} />
+                  <Route path="ipd" element={<IPD />} />
+                  <Route path="settings" element={<Settings />} />
                   <Route path="bills" element={<Bills />} />
                   <Route path="bills/create" element={<CreateBill />} />
                   <Route path="bills/:id" element={<BillDetail />} />
@@ -74,9 +85,12 @@ function App() {
                 
                 {/* Catch all route */}
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
-              </Routes>
-            </div>
-          </Router>
+                </Routes>
+                </div>
+              </Router>
+              <ToastContainer />
+            </ConfirmProvider>
+          </ToastProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
